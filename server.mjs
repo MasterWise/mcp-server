@@ -119,7 +119,7 @@ app.post("/mcp", auth, async (req, res) => {
 
 // Rota de “preview” amigável (não-MCP) — útil pra teste rápido no navegador
 app.get("/", (_req, res) => {
-  const out = horaAtualBrasilia();
+  const out = dataHoraPorExtenso();
   res
     .type("text/plain")
     .send(`${out.texto}\n${out.textoPorExtenso}`);
