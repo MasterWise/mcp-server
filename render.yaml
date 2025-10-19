@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: mcp-server
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: "npm ci"
+    startCommand: "npm start"
+    autoDeploy: true
+    envVars:
+      - key: MCP_TOKEN
+        generateValue: true
