@@ -83,7 +83,12 @@ server.registerTool(
     title: "Data e hora por extenso (pt-BR)",
     description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
     inputSchema: z.object({}),
-    outputSchema: { texto: z.string(), iso: z.string(), timeZone: z.string() }
+    outputSchema: z.object({
+      texto: z.string(),
+      textoPorExtenso: z.string(),
+      iso: z.string(),
+      timeZone: z.string(),
+    })
   },
   async () => {
     const out = dataHoraPorExtenso();
