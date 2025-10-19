@@ -82,12 +82,12 @@ server.registerTool(
   {
     title: "Hora de Brasília",
     description: "Retorna a hora atual do horário de Brasília (Brasil).",
-    outputSchema: z.object({
+    outputSchema: {
       texto: z.string(),
       textoPorExtenso: z.string(),
       iso: z.string(),
       timeZone: z.string()
-    })
+    }
   },
   async () => {
     const out = horaAtualBrasilia();
