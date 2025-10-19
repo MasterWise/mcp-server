@@ -44,10 +44,6 @@ function dataHoraPorExtenso() {
   const now = new Date();
   const fmt = new Intl.DateTimeFormat("pt-BR", {
     timeZone,
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
     hour: "numeric",
     minute: "numeric",
     second: "numeric",
@@ -55,8 +51,6 @@ function dataHoraPorExtenso() {
     timeZoneName: "short"
   });
   const parts = Object.fromEntries(fmt.formatToParts(now).map(p => [p.type, p.value]));
-  const diaNum = parseInt(parts.day, 10);
-  const anoNum = parseInt(parts.year, 10);
   const horaNum = parseInt(parts.hour, 10);
   const minNum  = parseInt(parts.minute, 10);
   const segNum  = parseInt(parts.second, 10);
@@ -67,13 +61,14 @@ function dataHoraPorExtenso() {
   const segExt = numeroPorExtenso0a59(segNum);
 
   const texto =
-    `${capitalize(parts.weekday)}, ` +
-    `${numeroPorExtenso0a59(diaNum)} de ${parts.month} de ${anoPorExtenso(anoNum)}, ` +
-    `às ${horaExt} ${horaNum === 1 ? "hora" : "horas"}, ` +
+    `Horário de Brasília: ${parts.hour.padStart(2, "0")}:${parts.minute.padStart(2, "0")}:${parts.second.padStart(2, "0")} (${parts.timeZoneName}).`;
+
+  const textoPorExtenso =
+    `Horário de Brasília: ${capitalize(horaExt)} ${horaNum === 1 ? "hora" : "horas"}, ` +
     `${minExt} ${minNum === 1 ? "minuto" : "minutos"} e ` +
     `${segExt} ${segNum === 1 ? "segundo" : "segundos"} (${parts.timeZoneName}).`;
 
-  return { texto, iso: now.toISOString(), timeZone };
+  return { texto, textoPorExtenso, iso: now.toISOString(), timeZone };
 }
 
 /** ========= MCP setup ========= */
@@ -83,7 +78,7 @@ app.use(express.json());
 const server = new McpServer({ name: "mcp-data-hora-ptbr", version: "1.0.0" });
 
 server.registerTool(
-  "data_hora_extenso",
+  "hora_atual_brasilia",
   {
     title: "Data e hora por extenso (pt-BR)",
     description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
@@ -93,7 +88,10 @@ server.registerTool(
   async () => {
     const out = dataHoraPorExtenso();
     return {
-      content: [{ type: "text", text: out.texto }],
+      content: [
+        { type: "text", text: out.texto },
+        { type: "text", text: out.textoPorExtenso }
+      ],
       structuredContent: out,
     };
   }
@@ -121,8 +119,10 @@ app.post("/mcp", auth, async (req, res) => {
 
 // Rota de “preview” amigável (não-MCP) — útil pra teste rápido no navegador
 app.get("/", (_req, res) => {
-  const out = dataHoraPorExtenso();
-  res.type("text/plain").send(out.texto);
+  const out = horaAtualBrasilia();
+  res
+    .type("text/plain")
+    .send(`${out.texto}\n${out.textoPorExtenso}`);
 });
 
 const port = parseInt(process.env.PORT || "3000", 10);
