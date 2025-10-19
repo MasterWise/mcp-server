@@ -39,7 +39,7 @@ function anoPorExtenso(ano) {
 function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 
 /** ========= formatter principal ========= */
-function horaAtualBrasilia() {
+function dataHoraPorExtenso() {
   const timeZone = "America/Sao_Paulo";
   const now = new Date();
   const fmt = new Intl.DateTimeFormat("pt-BR", {
@@ -80,17 +80,13 @@ const server = new McpServer({ name: "mcp-data-hora-ptbr", version: "1.0.0" });
 server.registerTool(
   "hora_atual_brasilia",
   {
-    title: "Hora de Brasília",
-    description: "Retorna a hora atual do horário de Brasília (Brasil).",
-    outputSchema: {
-      texto: z.string(),
-      textoPorExtenso: z.string(),
-      iso: z.string(),
-      timeZone: z.string()
-    }
+    title: "Data e hora por extenso (pt-BR)",
+    description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
+    inputSchema: z.object({}),
+    outputSchema: { texto: z.string(), iso: z.string(), timeZone: z.string() }
   },
   async () => {
-    const out = horaAtualBrasilia();
+    const out = dataHoraPorExtenso();
     return {
       content: [
         { type: "text", text: out.texto },
