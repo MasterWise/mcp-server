@@ -2,6 +2,7 @@ import express from "express";
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { fileURLToPath } from "node:url";
 
 /** ========= util: números por extenso (pt-BR) ========= */
 const UNITS = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"];
@@ -39,7 +40,7 @@ function anoPorExtenso(ano) {
 function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 
 /** ========= formatter principal ========= */
-function dataHoraPorExtenso() {
+export function dataHoraPorExtenso() {
   const timeZone = "America/Sao_Paulo";
   const now = new Date();
   const fmt = new Intl.DateTimeFormat("pt-BR", {
@@ -72,35 +73,12 @@ function dataHoraPorExtenso() {
 }
 
 /** ========= MCP setup ========= */
-const app = express();
-app.use(express.json());
-
-const server = new McpServer({ name: "mcp-data-hora-ptbr", version: "1.0.0" });
-
-server.registerTool(
-  "hora_atual_brasilia",
-  {
-    title: "Data e hora por extenso (pt-BR)",
-    description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
-    inputSchema: z.object({}),
-    outputSchema: z.object({
-      texto: z.string(),
-      textoPorExtenso: z.string(),
-      iso: z.string(),
-      timeZone: z.string(),
-    })
-  },
-  async () => {
-    const out = dataHoraPorExtenso();
-    return {
-      content: [
-        { type: "text", text: out.texto },
-        { type: "text", text: out.textoPorExtenso }
-      ],
-      structuredContent: out,
-    };
-  }
-);
+export const horaAtualBrasiliaOutputSchema = z.object({
+  texto: z.string(),
+  textoPorExtenso: z.string(),
+  iso: z.string(),
+  timeZone: z.string(),
+});
 
 // Auth opcional via Bearer (defina MCP_TOKEN no Render)
 const TOKEN = process.env.MCP_TOKEN;
@@ -114,23 +92,55 @@ function auth(req, res, next) {
   next();
 }
 
-// Endpoint MCP (Streamable HTTP)
-app.post("/mcp", auth, async (req, res) => {
-  const transport = new StreamableHTTPServerTransport({ enableJsonResponse: true });
-  res.on("close", () => transport.close());
-  await server.connect(transport);
-  await transport.handleRequest(req, res, req.body);
-});
+export function createApp() {
+  const app = express();
+  app.use(express.json());
 
-// Rota de “preview” amigável (não-MCP) — útil pra teste rápido no navegador
-app.get("/", (_req, res) => {
-  const out = dataHoraPorExtenso();
-  res
-    .type("text/plain")
-    .send(`${out.texto}\n${out.textoPorExtenso}`);
-});
+  const server = new McpServer({ name: "mcp-data-hora-ptbr", version: "1.0.0" });
 
-const port = parseInt(process.env.PORT || "3000", 10);
-app.listen(port, () => {
-  console.log(`MCP pronto em http://localhost:${port}/mcp  — preview: http://localhost:${port}/`);
-});
+  server.registerTool(
+    "hora_atual_brasilia",
+    {
+      title: "Data e hora por extenso (pt-BR)",
+      description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
+      inputSchema: z.object({}),
+      outputSchema: horaAtualBrasiliaOutputSchema,
+    },
+    async () => {
+      const out = dataHoraPorExtenso();
+      return {
+        content: [
+          { type: "text", text: out.texto },
+          { type: "text", text: out.textoPorExtenso }
+        ],
+        structuredContent: out,
+      };
+    }
+  );
+
+  // Endpoint MCP (Streamable HTTP)
+  app.post("/mcp", auth, async (req, res) => {
+    const transport = new StreamableHTTPServerTransport({ enableJsonResponse: true });
+    res.on("close", () => transport.close());
+    await server.connect(transport);
+    await transport.handleRequest(req, res, req.body);
+  });
+
+  // Rota de “preview” amigável (não-MCP) — útil pra teste rápido no navegador
+  app.get("/", (_req, res) => {
+    const out = dataHoraPorExtenso();
+    res
+      .type("text/plain")
+      .send(`${out.texto}\n${out.textoPorExtenso}`);
+  });
+
+  return { app, server };
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const { app } = createApp();
+  const port = parseInt(process.env.PORT || "3000", 10);
+  app.listen(port, () => {
+    console.log(`MCP pronto em http://localhost:${port}/mcp  — preview: http://localhost:${port}/`);
+  });
+}
