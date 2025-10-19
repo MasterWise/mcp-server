@@ -39,7 +39,8 @@ function anoPorExtenso(ano) {
 function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 
 /** ========= formatter principal ========= */
-function dataHoraPorExtenso({ timeZone = "America/Sao_Paulo" } = {}) {
+function dataHoraPorExtenso() {
+  const timeZone = "America/Sao_Paulo";
   const now = new Date();
   const fmt = new Intl.DateTimeFormat("pt-BR", {
     timeZone,
@@ -85,12 +86,12 @@ server.registerTool(
   "data_hora_extenso",
   {
     title: "Data e hora por extenso (pt-BR)",
-    description: "Retorna a data e a hora atuais por extenso em português do Brasil.",
-    inputSchema: { timeZone: z.string().optional() },
-    outputSchema: { texto: z.string(), iso: z.string(), timeZone: z.string() }
+    description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
+    inputSchema: z.object({}),
+    outputSchema: z.object({ texto: z.string(), iso: z.string(), timeZone: z.string() })
   },
-  async ({ timeZone }) => {
-    const out = dataHoraPorExtenso({ timeZone });
+  async () => {
+    const out = dataHoraPorExtenso();
     return {
       content: [{ type: "text", text: out.texto }],
       structuredContent: out,
