@@ -76,7 +76,7 @@ export function dataHoraPorExtenso() {
 export const horaAtualBrasiliaOutputSchema = z.object({
   texto: z.string(),
   textoPorExtenso: z.string(),
-  iso: z.string(),
+  iso: z.string().datetime({ message: "Invalid ISO 8601 date string" }),
   timeZone: z.string(),
 });
 
