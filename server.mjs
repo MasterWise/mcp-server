@@ -103,7 +103,7 @@ export function createApp() {
     {
       title: "Data e hora por extenso (pt-BR)",
       description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
-      inputSchema: z.object({}),
+      inputSchema: z.object({}).strict(),
       outputSchema: horaAtualBrasiliaOutputSchema,
     },
     async () => {
