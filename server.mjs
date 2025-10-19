@@ -73,12 +73,14 @@ export function dataHoraPorExtenso() {
 }
 
 /** ========= MCP setup ========= */
-export const horaAtualBrasiliaOutputSchema = z.object({
+const horaAtualBrasiliaOutputShape = {
   texto: z.string(),
   textoPorExtenso: z.string(),
   iso: z.string().datetime({ message: "Invalid ISO 8601 date string" }),
   timeZone: z.string(),
-});
+};
+
+export const horaAtualBrasiliaOutputSchema = z.object(horaAtualBrasiliaOutputShape);
 
 // Auth opcional via Bearer (defina MCP_TOKEN no Render)
 const TOKEN = process.env.MCP_TOKEN;
@@ -103,11 +105,10 @@ export function createApp() {
     {
       title: "Data e hora por extenso (pt-BR)",
       description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
-      inputSchema: z.object({}).strict(),
-      outputSchema: horaAtualBrasiliaOutputSchema,
+      outputSchema: horaAtualBrasiliaOutputShape,
     },
     async () => {
-      const out = dataHoraPorExtenso();
+      const out = horaAtualBrasiliaOutputSchema.parse(dataHoraPorExtenso());
       return {
         content: [
           { type: "text", text: out.texto },
