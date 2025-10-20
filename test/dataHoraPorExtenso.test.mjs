@@ -6,6 +6,10 @@ import { dataHoraPorExtenso, horaAtualBrasiliaOutputSchema } from "../server.mjs
 test("dataHoraPorExtenso matches the horaAtualBrasilia schema", () => {
   const out = dataHoraPorExtenso();
   const parseResult = horaAtualBrasiliaOutputSchema.safeParse(out);
+  if (!parseResult.success) {
+    console.log(out);
+    console.log(JSON.stringify(parseResult.error?.format(), null, 2));
+  }
   assert.equal(parseResult.success, true, () => JSON.stringify(parseResult.error?.format(), null, 2));
 
   // sanity checks on ISO date and timezone consistency

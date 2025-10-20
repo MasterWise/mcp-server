@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Consent</title>
+</head>
+<body>
+  <h1>Consent</h1>
+  <p>Client <%= client.clientName || client.clientId %> is requesting access to your account.</p>
+
+  <form action="<%= formAction %>/confirm" method="post">
+    <p>Scopes requested:</p>
+    <ul>
+      <% for (const scope of prompts.details.scopes.new) { %>
+        <li><%= scope %></li>
+      <% } %>
+    </ul>
+    <button type="submit">Allow</button>
+  </form>
+
+  <form action="<%= formAction %>/abort" method="post">
+    <button type="submit">Deny</button>
+  </form>
+</body>
+</html>

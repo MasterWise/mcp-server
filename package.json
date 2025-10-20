@@ -4,12 +4,21 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "node server.mjs",
+    "start": "concurrently \"node oidcServer.mjs\" \"node server.mjs\"",
     "test": "node --test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.2.0",
+    "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "express-oauth2-jwt-bearer": "^1.7.1",
+    "koa": "^3.0.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-ejs": "^4.3.0",
+    "oidc-provider": "^9.5.1",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
