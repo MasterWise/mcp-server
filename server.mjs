@@ -3,6 +3,7 @@ import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { fileURLToPath } from "node:url";
+import { createJwtCheck } from "./auth.mjs";
 
 /** ========= util: números por extenso (pt-BR) ========= */
 const UNITS = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"];
@@ -82,17 +83,6 @@ const horaAtualBrasiliaOutputShape = {
 
 export const horaAtualBrasiliaOutputSchema = z.object(horaAtualBrasiliaOutputShape);
 
-// Auth opcional via Bearer (defina MCP_TOKEN no Render)
-const TOKEN = process.env.MCP_TOKEN;
-function auth(req, res, next) {
-  if (!TOKEN) return next();
-  const authz = req.get("authorization") || "";
-  if (authz !== `Bearer ${TOKEN}`) {
-    res.setHeader("www-authenticate", "Bearer");
-    return res.status(401).send("Unauthorized");
-  }
-  next();
-}
 
 export function createApp() {
   const app = express();
@@ -120,11 +110,22 @@ export function createApp() {
   );
 
   // Endpoint MCP (Streamable HTTP)
-  app.post("/mcp", auth, async (req, res) => {
+  const jwtCheck = createJwtCheck();
+
+  app.post("/mcp", jwtCheck, async (req, res) => {
     const transport = new StreamableHTTPServerTransport({ enableJsonResponse: true });
     res.on("close", () => transport.close());
     await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
+  });
+
+  // ChatGPT OAuth discovery endpoint
+  app.get("/.well-known/oauth-protected-resource", (_req, res) => {
+    res.json({
+      authorization_servers: [
+        process.env.OAUTH_ISSUER_BASE_URL,
+      ]
+    });
   });
 
   // Rota de “preview” amigável (não-MCP) — útil pra teste rápido no navegador

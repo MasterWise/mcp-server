@@ -8,5 +8,7 @@ services:
     startCommand: "npm start"
     autoDeploy: true
     envVars:
-      - key: MCP_TOKEN
-        generateValue: true
+      - key: OAUTH_ISSUER_BASE_URL
+        value: "CHANGEME" # Ex: https://your-tenant.us.auth0.com/
+      - key: OAUTH_AUDIENCE
+        value: "CHANGEME" # Ex: https://api.example.com/
