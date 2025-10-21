@@ -3,7 +3,7 @@ import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { fileURLToPath } from "node:url";
-import { jwtCheck } from "./auth.mjs";
+import { createJwtCheck } from "./auth.mjs";
 
 /** ========= util: números por extenso (pt-BR) ========= */
 const UNITS = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"];
@@ -110,6 +110,8 @@ export function createApp() {
   );
 
   // Endpoint MCP (Streamable HTTP)
+  const jwtCheck = createJwtCheck();
+
   app.post("/mcp", jwtCheck, async (req, res) => {
     const transport = new StreamableHTTPServerTransport({ enableJsonResponse: true });
     res.on("close", () => transport.close());
