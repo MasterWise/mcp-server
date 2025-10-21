@@ -7,7 +7,8 @@ import render from 'koa-ejs';
 import http from 'http';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ISSUER_URL = 'http://localhost:3001';
+const port = parseInt(process.env.OIDC_PORT || process.env.PORT || '3001', 10);
+const ISSUER_URL = process.env.ISSUER_URL || `http://localhost:${port}`;
 
 const app = new Koa();
 app.use(bodyParser());
@@ -76,7 +77,6 @@ app.use(async (ctx, next) => {
 app.use(oidc.callback());
 
 const server = http.createServer(app.callback());
-const port = 3001;
 server.listen(port, () => {
   console.log(`oidc-provider listening on port ${port}, check ${ISSUER_URL}/.well-known/openid-configuration`);
 });

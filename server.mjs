@@ -5,7 +5,8 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { fileURLToPath } from "node:url";
 import { auth } from 'express-oauth2-jwt-bearer';
 
-const ISSUER_URL = process.env.ISSUER_URL || "http://localhost:3001";
+const oidcPort = process.env.OIDC_PORT || process.env.PORT || "3001";
+const ISSUER_URL = process.env.ISSUER_URL || `http://localhost:${oidcPort}`;
 
 /** ========= util: números por extenso (pt-BR) ========= */
 const UNITS = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"];
@@ -110,11 +111,16 @@ export function createApp() {
     }
   );
 
-  const jwtCheck = auth({
+  const jwtOptions = {
     issuerBaseURL: ISSUER_URL,
-    audience: 'mcp-client',
     tokenSigningAlg: 'RS256',
-  });
+  };
+
+  if (process.env.MCP_EXPECTED_AUDIENCE) {
+    jwtOptions.audience = process.env.MCP_EXPECTED_AUDIENCE;
+  }
+
+  const jwtCheck = auth(jwtOptions);
 
   // Endpoint MCP (Streamable HTTP) - protegido por OAuth
   app.post("/mcp", jwtCheck, async (req, res) => {
