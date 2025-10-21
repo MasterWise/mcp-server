@@ -8,5 +8,9 @@ services:
     startCommand: "npm start"
     autoDeploy: true
     envVars:
-      - key: MCP_TOKEN
+      - key: ISSUER_URL
+        value: "https://your-app-name.onrender.com"
+      - key: COOKIE_KEYS
+        generateValue: true
+      - key: JWKS_KEY
         generateValue: true

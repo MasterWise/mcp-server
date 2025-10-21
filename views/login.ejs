@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <form action="<%= formAction %>" method="post">
+    <input type="hidden" name="uid" value="<%= uid %>">
+    <label for="login">Username:</label>
+    <input type="text" id="login" name="login" value="user123" required>
+    <button type="submit">Login</button>
+  </form>
+</body>
+</html>
