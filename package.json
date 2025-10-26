@@ -16,6 +16,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "sinon": "^21.0.0",
     "supertest": "^7.1.4"
   }
 }
