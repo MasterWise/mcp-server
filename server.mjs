@@ -200,7 +200,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
     const availableTools = Object.keys(server._registeredTools).map(toolName => {
       const tool = server._registeredTools[toolName];
-      const params = Object.keys(tool.inputSchema).join(", ");
+      // Acessa a propriedade .shape do esquema Zod para obter as chaves dos parâmetros
+      const params = tool.inputSchema.shape ? Object.keys(tool.inputSchema.shape).join(", ") : "";
       return `* ${toolName}(${params})`;
     }).join("\n");
 
