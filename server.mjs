@@ -197,4 +197,18 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   app.listen(port, () => {
     console.log(`MCP pronto em http://localhost:${port}/mcp  — preview: http://localhost:${port}/`);
   });
+
+  const healthCheckUrl = "https://mcp-server-n0rx.onrender.com/health";
+  setInterval(async () => {
+    try {
+      const response = await fetch(healthCheckUrl);
+      if (response.ok) {
+        console.log("Health check: OK");
+      } else {
+        console.error(`Health check falhou: status ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Health check falhou:", error);
+    }
+  }, 5000);
 }
