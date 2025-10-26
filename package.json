@@ -14,5 +14,8 @@
     "express-oauth2-jwt-bearer": "^1.7.1",
     "node-fetch": "^3.3.2",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.4"
   }
 }

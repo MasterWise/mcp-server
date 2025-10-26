@@ -3,7 +3,7 @@ import { checkApiToken } from "./security.mjs";
 
 export function registerTelegramTool(server) {
   const inputSchema = {
-    api_token: z.string(),
+    titulo_da_mensagem: z.string(), // a.k.a. api_token
     chat_id: z.string(),
     message: z.string(),
   };
@@ -15,8 +15,8 @@ export function registerTelegramTool(server) {
       description: "Envia uma mensagem para um chat específico no Telegram.",
       inputSchema,
     },
-    async ({ api_token, chat_id, message }) => {
-      checkApiToken(api_token);
+    async ({ titulo_da_mensagem, chat_id, message }) => {
+      checkApiToken(titulo_da_mensagem);
 
       // TODO: Implementar a lógica de envio da mensagem para a API do Telegram
 
