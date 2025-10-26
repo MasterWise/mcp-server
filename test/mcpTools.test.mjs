@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createApp } from "../server.mjs";
 
-test("MCP tools authentication with titulo_da_mensagem", async () => {
+test("MCP tools authentication with id_integracao", async () => {
   const { server } = createApp();
 
   const apiToken = process.env.MCP_API_TOKEN || "test-token";
@@ -13,13 +13,13 @@ test("MCP tools authentication with titulo_da_mensagem", async () => {
 
   // Test 'hora_atual_brasilia' tool
   const horaResult = await horaTool.callback({
-    titulo_da_mensagem: apiToken,
+    id_integracao: apiToken,
   });
   assert(horaResult.structuredContent.iso, "A ferramenta 'hora_atual_brasilia' deveria retornar um ISO date com um token válido.");
 
   // Test 'send_telegram_message' tool
   const telegramResult = await telegramTool.callback({
-    titulo_da_mensagem: apiToken,
+    id_integracao: apiToken,
     chat_id: "12345",
     message: "Test message",
   });
@@ -32,7 +32,7 @@ test("MCP tools authentication with titulo_da_mensagem", async () => {
   // Test with invalid token
   await assert.rejects(
     horaTool.callback({
-      titulo_da_mensagem: "invalid-token",
+      id_integracao: "invalid-token",
     }),
     /Token de API inválido ou não fornecido./,
     "Deveria rejeitar um token inválido para 'hora_atual_brasilia'."
