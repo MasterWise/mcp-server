@@ -1,5 +1,34 @@
+import fs from "fs";
+import path from "path";
 import express from "express";
 import { z } from "zod";
+
+// --- Início do processo de inicialização "Zero-Config" ---
+// Carrega as variáveis de ambiente do .env.example se não estiverem definidas
+const envExamplePath = path.resolve(process.cwd(), ".env.example");
+if (fs.existsSync(envExamplePath)) {
+  const envExampleContent = fs.readFileSync(envExamplePath, "utf-8");
+  const lines = envExampleContent.split("\n");
+
+  for (const line of lines) {
+    // Ignora comentários e linhas vazias
+    if (line.trim() === "" || line.trim().startsWith("#")) {
+      continue;
+    }
+
+    const parts = line.split("=");
+    if (parts.length >= 2) {
+      const key = parts[0].trim();
+      const value = parts.slice(1).join("=").trim();
+
+      // Define a variável de ambiente apenas se não estiver definida
+      if (!process.env[key] && value) {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+// --- Fim do processo de inicialização ---
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import fetch from "node-fetch";
