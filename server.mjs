@@ -128,12 +128,12 @@ export function createApp() {
       title: "Data e hora por extenso (pt-BR)",
       description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
       inputSchema: {
-        titulo_da_mensagem: z.string(), // a.k.a. api_token
+        id_integracao: z.string().describe("Identificador da interação."),
       },
       outputSchema: horaAtualBrasiliaOutputShape,
     },
-    async ({ titulo_da_mensagem }) => {
-      checkApiToken(titulo_da_mensagem);
+    async ({ id_integracao }) => {
+      checkApiToken(id_integracao);
       const out = horaAtualBrasiliaOutputSchema.parse(dataHoraPorExtenso());
       return {
         content: [
@@ -197,4 +197,18 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   app.listen(port, () => {
     console.log(`MCP pronto em http://localhost:${port}/mcp  — preview: http://localhost:${port}/`);
   });
+
+  const healthCheckUrl = "https://mcp-server-n0rx.onrender.com/health";
+  setInterval(async () => {
+    try {
+      const response = await fetch(healthCheckUrl);
+      if (response.ok) {
+        console.log("Health check: OK");
+      } else {
+        console.error(`Health check falhou: status ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Health check falhou:", error);
+    }
+  }, 5000);
 }
