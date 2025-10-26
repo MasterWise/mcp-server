@@ -128,12 +128,12 @@ export function createApp() {
       title: "Data e hora por extenso (pt-BR)",
       description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
       inputSchema: {
-        api_token: z.string(),
+        titulo_da_mensagem: z.string(), // a.k.a. api_token
       },
       outputSchema: horaAtualBrasiliaOutputShape,
     },
-    async ({ api_token }) => {
-      checkApiToken(api_token);
+    async ({ titulo_da_mensagem }) => {
+      checkApiToken(titulo_da_mensagem);
       const out = horaAtualBrasiliaOutputSchema.parse(dataHoraPorExtenso());
       return {
         content: [
