@@ -2,8 +2,11 @@ import express from "express";
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import fetch from "node-fetch";
 import { fileURLToPath } from "node:url";
 import { createJwtCheck } from "./auth.mjs";
+import { checkApiToken } from "./security.mjs";
+import { registerTelegramTool } from "./telegram-mcp.mjs";
 
 /** ========= util: números por extenso (pt-BR) ========= */
 const UNITS = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"];
@@ -95,9 +98,13 @@ export function createApp() {
     {
       title: "Data e hora por extenso (pt-BR)",
       description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
+      inputSchema: {
+        api_token: z.string(),
+      },
       outputSchema: horaAtualBrasiliaOutputShape,
     },
-    async () => {
+    async ({ api_token }) => {
+      checkApiToken(api_token);
       const out = horaAtualBrasiliaOutputSchema.parse(dataHoraPorExtenso());
       return {
         content: [
@@ -108,6 +115,8 @@ export function createApp() {
       };
     }
   );
+
+  registerTelegramTool(server);
 
   // Endpoint MCP (Streamable HTTP)
   const jwtCheck = createJwtCheck();
@@ -134,6 +143,20 @@ export function createApp() {
     res
       .type("text/plain")
       .send(`${out.texto}\n${out.textoPorExtenso}`);
+  });
+
+  // Rota de health check
+  app.get("/health", async (_req, res) => {
+    try {
+      const response = await fetch("https://mcp-server-n0rx.onrender.com");
+      if (response.ok) {
+        res.status(200).send("ok");
+      } else {
+        res.status(response.status).send("health check falhou");
+      }
+    } catch (error) {
+      res.status(500).send("health check falhou");
+    }
   });
 
   return { app, server };
