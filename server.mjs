@@ -211,6 +211,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     // Envia o log de inicialização para o Jhon
     const jhonChatId = process.env.CHAT_ID_JHON;
     if (jhonChatId) {
+      console.log(`Tentando enviar log de inicialização para o CHAT_ID_JHON: ${jhonChatId}`);
+      console.log(`Conteúdo da mensagem:\n${startupMessage}`);
       try {
         await telegramApi.sendTelegramMessage(jhonChatId, startupMessage);
         console.log("Log de inicialização enviado para o Jhon.");
