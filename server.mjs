@@ -35,7 +35,7 @@ import fetch from "node-fetch";
 import { fileURLToPath } from "node:url";
 import { createJwtCheck } from "./auth.mjs";
 import { checkApiToken } from "./security.mjs";
-import { registerTelegramTool } from "./telegram-mcp.mjs";
+import { registerTelegramTool, telegramApi } from "./telegram-mcp.mjs";
 
 /** ========= util: números por extenso (pt-BR) ========= */
 const UNITS = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove"];
@@ -192,10 +192,31 @@ export function createApp() {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const { app } = createApp();
+  const { app, server } = createApp();
   const port = parseInt(process.env.PORT || "3000", 10);
-  app.listen(port, () => {
+  app.listen(port, async () => {
+    console.log("Servidor MCP iniciado com sucesso!");
     console.log(`MCP pronto em http://localhost:${port}/mcp  — preview: http://localhost:${port}/`);
+
+    const availableTools = Object.keys(server._registeredTools).map(toolName => {
+      const tool = server._registeredTools[toolName];
+      const params = Object.keys(tool.inputSchema).join(", ");
+      return `* ${toolName}(${params})`;
+    }).join("\n");
+
+    const startupMessage = `Servidor MCP iniciado com sucesso!\n\nTools disponíveis:\n${availableTools}`;
+    console.log(startupMessage);
+
+    // Envia o log de inicialização para o Jhon
+    const jhonChatId = process.env.CHAT_ID_JHON;
+    if (jhonChatId) {
+      try {
+        await telegramApi.sendTelegramMessage(jhonChatId, startupMessage);
+        console.log("Log de inicialização enviado para o Jhon.");
+      } catch (error) {
+        console.error("Falha ao enviar log de inicialização para o Jhon:", error);
+      }
+    }
   });
 
   const healthCheckUrl = "https://mcp-server-n0rx.onrender.com/health";
