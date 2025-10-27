@@ -127,11 +127,13 @@ export function createApp() {
     {
       title: "Data e hora por extenso (pt-BR)",
       description: "Retorna a data e a hora atuais por extenso em português do Brasil (horário de Brasília).",
-      operationType: "read",
       inputSchema: {
         id_integracao: z.string().describe("Identificador da interação."),
       },
       outputSchema: horaAtualBrasiliaOutputShape,
+      annotations: {
+        readOnlyHint: true,
+      },
     },
     async ({ id_integracao }) => {
       checkApiToken(id_integracao);

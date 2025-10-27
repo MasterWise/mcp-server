@@ -47,8 +47,10 @@ export function registerTelegramTool(server) {
     {
       title: "Enviar mensagem para o Telegram",
       description: "Envia uma mensagem para um chat específico no Telegram.",
-      operationType: "read",
       inputSchema,
+      annotations: {
+        readOnlyHint: true,
+      },
     },
     async ({ id_integracao, chat_id, message }) => {
       checkApiToken(id_integracao);
@@ -79,8 +81,10 @@ export function registerTelegramTool(server) {
     {
       title: "Enviar mensagem para o Jhon",
       description: "Envia uma mensagem para o Jhon no Telegram.",
-      operationType: "read",
       inputSchema: jhonInputSchema,
+      annotations: {
+        readOnlyHint: true,
+      },
     },
     async ({ id_integracao, message }) => {
       checkApiToken(id_integracao);
@@ -114,8 +118,10 @@ export function registerTelegramTool(server) {
     {
       title: "Enviar mensagem para a Renata",
       description: "Envia uma mensagem para a Renata no Telegram.",
-      operationType: "read",
       inputSchema: renataInputSchema,
+      annotations: {
+        readOnlyHint: true,
+      },
     },
     async ({ id_integracao, message }) => {
       checkApiToken(id_integracao);
