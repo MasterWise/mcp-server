@@ -47,6 +47,7 @@ export function registerTelegramTool(server) {
     {
       title: "Enviar mensagem para o Telegram",
       description: "Envia uma mensagem para um chat específico no Telegram.",
+      operationType: "read",
       inputSchema,
     },
     async ({ id_integracao, chat_id, message }) => {
@@ -78,6 +79,7 @@ export function registerTelegramTool(server) {
     {
       title: "Enviar mensagem para o Jhon",
       description: "Envia uma mensagem para o Jhon no Telegram.",
+      operationType: "read",
       inputSchema: jhonInputSchema,
     },
     async ({ id_integracao, message }) => {
@@ -112,6 +114,7 @@ export function registerTelegramTool(server) {
     {
       title: "Enviar mensagem para a Renata",
       description: "Envia uma mensagem para a Renata no Telegram.",
+      operationType: "read",
       inputSchema: renataInputSchema,
     },
     async ({ id_integracao, message }) => {
